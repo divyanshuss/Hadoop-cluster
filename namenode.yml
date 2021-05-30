@@ -1,0 +1,48 @@
+- hosts: namenode
+  vars:
+        hadoop: hadoop-1.2.1-1.x86_64.rpm
+        jdk: jdk-8u171-linux-x64.rpm
+       
+  tasks:
+  - name: " Copying the jdk file"
+    copy:
+        dest: "/root/"
+        src: "/root/{{jdk}}"
+
+  - name: "Copying the hadoop file"
+    copy:
+        dest: "/root/"
+        src: "/root/{{hadoop}}"
+
+  - name: "Install java file"
+    package:
+        name: "{{jdk}}"
+        disable_gpg_check: yes
+
+  - name: " Install hadoop file"
+    command: " rpm -ivh {{hadoop}} --force"
+  
+  - name: " Create directory for NN"
+    file:
+        path: "/root/namenode"
+        state: directory
+
+  - name: "copying the core file"
+    copy:
+        dest: "/etc/hadoop"
+        src: "/root/core-site.xml"
+
+  - name: "copying the hdfs file"
+    copy: 
+        dest: "/etc/hadoop"
+        src: "/root/hdfs-site.xml"
+ 
+  - name: " Formatting NN"
+    shell: echo Y | hadoop namenode -format
+
+  - name: "Starting Hadoop services"
+    command: " hadoop-daemon.sh start namenode"
+
+
+            
+

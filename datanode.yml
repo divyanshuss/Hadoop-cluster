@@ -1,0 +1,43 @@
+- hosts: datanode
+  vars:
+        hadoop: hadoop-1.2.1-1.x86_64.rpm
+        jdk: jdk-8u171-linux-x64.rpm
+      
+
+  tasks:
+  - name: "Copying hadoop file"
+    copy:
+        dest: "/root/"
+        src: "/root/{{hadoop}}"
+
+  - name: "Copying the jdk file"
+    copy:
+        dest: "/root/"
+        src: "/root/{{jdk}}"
+
+  - name: "Installing jdk file"
+    package:
+        name: "{{jdk}}"
+        disable_gpg_check: yes
+
+  - name: "Installing Hadoop"
+    command: " rpm -ivh {{hadoop}} --force "
+
+  - name: " Creating directory"
+    file: 
+       path: "root/datanode"
+       state: directory
+
+  - name: " Copy the core file"
+    copy: 
+         dest: "/etc/hadoop"
+         src: "/root/ws2/core-site.xml"
+
+  - name: " Copy the hdfs  file"
+    copy:
+         dest: "/etc/hadoop"
+         src: "/root/ws2/hdfs-site.xml"
+
+  - name: " Starting the cluster services"
+    command: " hadoop-daemon.sh start datanode"    
+    
